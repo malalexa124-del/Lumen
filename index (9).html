@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lumen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600&family=Manrope:wght@500;600;700&display=swap">
+<style>
+/* Layout: page on soft grey, content in white and navy rounded cards; one amber accent; display sans for headings. */
+:root{
+  --bg:#F1F2F0; --card:#FFFFFF; --card2:#E8EAE6; --fg:#15202B; --fg2:#5B6775; --line:#DADDD8;
+  --ink:#1B2A41; --ink-fg:#FFFFFF; --ink-muted:#AEB8C6;
+  --amber:#E6A63F; --amber-soft:#FBEBCF; --ok:#2E7D6B;
+  --display:"Unbounded","Arial Black",Arial,sans-serif; --body:"Manrope","Segoe UI",Arial,sans-serif;
+  --r:24px; --rs:14px; --max:1120px; --gut:clamp(16px,4vw,40px);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 var(--body);padding-inline:var(--gut);padding-block:0 40px}
+h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.1;text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(24px,2.9vw,40px);hyphens:manual;overflow-wrap:normal} h2{font-size:clamp(22px,2.6vw,32px);hyphens:manual} h3{font-size:17px;line-height:1.3;hyphens:manual}
+p{margin:0} a{color:var(--fg)}
+.wrap{max-width:var(--max);margin-inline:auto}
+.eyebrow{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.04em;padding:5px 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--fg2)}
+.lead{font-size:17px;color:var(--fg2);max-width:60ch}
+.num{font-variant-numeric:tabular-nums} .fine{font-size:13px;color:var(--fg2)}
+section{padding-block:clamp(36px,5vw,64px)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))} .g3{grid-template-columns:repeat(3,minmax(0,1fr))} .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:900px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}} @media (max-width:720px){.g3,.g2,.g4{grid-template-columns:1fr}}
+.grid>*,.hero>*,.split>*,.calc>*,.ask>*{min-width:0}
+.card{background:var(--card);border-radius:var(--r);padding:28px;min-width:0}
+.card.text>*,.feat .card>*,.steps .card>*,.ask>*{min-width:0;max-width:100%} .card.grey{background:var(--card2)} .card.ink{background:var(--ink);color:var(--ink-fg)} .card.ink p,.card.ink li,.card.ink .fine{color:var(--ink-muted)} .card.amber{background:var(--amber);color:#15202B} .card.amber p{color:#3a3a3a}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 24px;border-radius:999px;font:inherit;font-weight:700;text-decoration:none;border:1px solid transparent;cursor:pointer;font-size:15px}
+.btn.dark{background:var(--ink);color:#fff} .btn.light{background:var(--card);color:var(--fg);border-color:var(--line)} .btn.amber{background:var(--amber);color:#15202B}
+.btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:18px;font-weight:600;color:var(--fg);text-decoration:none;background:var(--card);border-radius:999px;padding:8px 16px 8px 10px}
+.brand i{width:16px;height:16px;border-radius:50%;background:var(--amber);display:inline-block}
+nav ul{display:flex;gap:4px;list-style:none;margin:0;padding:4px;background:var(--card);border-radius:999px;flex-wrap:wrap}
+nav ul a{color:var(--fg2);text-decoration:none;font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;display:inline-block}
+nav ul a.active{background:var(--ink);color:#fff}
+.page[hidden]{display:none!important}
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:stretch}
+@media (max-width:860px){.hero{grid-template-columns:1fr}}
+.hero .text{display:grid;grid-template-columns:minmax(0,1fr);align-content:center;gap:18px;padding:clamp(28px,4vw,56px);overflow:hidden}
+.hero h1 em{font-style:normal;color:var(--amber)}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+.art{position:relative;min-height:420px;border-radius:var(--r);background:var(--ink);overflow:hidden}
+.art .glow{position:absolute;inset:auto -20% -40% -20%;height:70%;background:radial-gradient(closest-side,rgba(230,166,63,.35),transparent 70%)}
+.blk{position:absolute;border-radius:18px;padding:16px 18px;font-family:var(--display);font-size:13px;font-weight:600;box-shadow:0 20px 40px rgba(0,0,0,.35);display:grid;grid-template-rows:1fr auto auto;align-content:stretch;gap:3px}
+.blk .ico{width:min(100%,120px);height:auto;align-self:start;color:currentColor;opacity:.9;margin-bottom:6px}
+.blk small{font-family:var(--body);font-weight:600;font-size:12px;opacity:.85}
+.b1{left:7%;top:8%;width:40%;height:40%;background:#F4F5F2;color:#15202B;transform:rotate(-3deg)}
+.b2{right:7%;top:8%;width:40%;height:40%;background:var(--amber);color:#15202B;transform:rotate(3deg)}
+.b3{left:7%;bottom:8%;width:40%;height:40%;background:#2A3B55;color:#fff;transform:rotate(2deg)}
+.b4{right:7%;bottom:8%;width:40%;height:40%;background:#F4F5F2;color:#15202B;transform:rotate(-2deg)}
+/* pills row */
+.pills{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.pills{grid-template-columns:repeat(2,minmax(0,1fr))}} @media (max-width:480px){.pills{grid-template-columns:1fr}}
+.pill{background:var(--card);border-radius:999px;padding:22px 24px;text-align:center;display:grid;gap:2px}
+.pill b{font-family:var(--display);font-size:24px} .pill span{font-size:13px;color:var(--fg2)}
+.pill.amber{background:var(--amber);color:#15202B} .pill.amber span{color:#3a3a3a}
+/* feature cards */
+.feat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+@media (max-width:900px){.feat{grid-template-columns:repeat(2,minmax(0,1fr))}} @media (max-width:560px){.feat{grid-template-columns:1fr}}
+.feat .card{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-content:start;min-height:220px} .feat .n{font-family:var(--display);font-size:13px;color:var(--fg2)} .feat p{color:var(--fg2);font-size:14.5px}
+.feat .card.ink .n{color:var(--ink-muted)}
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px} @media (max-width:720px){.steps{grid-template-columns:1fr}}
+.steps .card{display:grid;grid-template-columns:minmax(0,1fr);gap:10px} .steps .n{width:36px;height:36px;border-radius:50%;background:var(--amber);color:#15202B;display:grid;place-items:center;font-family:var(--display);font-size:14px;font-weight:600} .steps p{color:var(--fg2);font-size:15px}
+/* ask / forms */
+.ask{display:grid;grid-template-columns:1fr 1fr;gap:28px;padding:clamp(24px,4vw,44px)} .g3>.ask{padding:28px;gap:18px} @media (max-width:760px){.ask{grid-template-columns:1fr}}
+.ask form{display:grid;gap:12px} label.l{font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--ink-muted)}
+.ask input,.ask select{width:100%;padding:14px 16px;border-radius:14px;border:1px solid #3A4A63;background:#0F1826;color:#EEF2F6;font:inherit}
+.ask .note{font-size:13px;color:#7FD1B9;min-height:1.5em}
+/* stats */
+.stat{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;align-content:start} .stat b{font-family:var(--display);font-size:clamp(18px,1.7vw,24px);color:var(--amber);white-space:nowrap} .stat span{font-size:14px} .stat small{font-size:12px;color:var(--fg2)}
+/* packages */
+.pk{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;align-content:start} .pk .price{font-family:var(--display);font-size:clamp(20px,1.8vw,24px);white-space:nowrap} .pk .price small{display:block;font-family:var(--body);font-size:14px;color:var(--fg2);font-weight:600;margin-top:4px}
+.pk .eyebrow,.stat .eyebrow,.steps .eyebrow{justify-self:start;align-self:start}
+.pk ul{margin:6px 0 0;padding-left:18px;color:var(--fg2);font-size:14.5px} .pk.featured{outline:3px solid var(--amber)}
+/* calc */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start} @media (max-width:760px){.calc{grid-template-columns:1fr}}
+.calc label{display:block;font-size:14px;color:var(--fg2);margin-bottom:6px;font-weight:600} .calc input[type=range]{width:100%;accent-color:var(--amber)}
+.calc .out{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px} @media (max-width:480px){.calc .out{grid-template-columns:1fr}}
+.calc .out div{background:var(--card2);border-radius:var(--rs);padding:14px} .calc .out b{font-family:var(--display);font-size:22px;display:block} .calc .out span{font-size:12.5px;color:var(--fg2)}
+/* finmodel */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch} @media (max-width:760px){.split{grid-template-columns:1fr}}
+.fm-wrap{overflow-x:auto} .fm{width:100%;border-collapse:collapse;font-size:14px} .fm td,.fm th{padding:10px 4px;border-top:1px solid var(--line);text-align:left;overflow-wrap:anywhere} .fm th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--fg2)}
+.fm td.num,.fm th.num{text-align:right;white-space:nowrap} .fm tr.total td{font-weight:700;border-top:2px solid var(--fg)}
+.scale{display:grid;gap:10px;align-content:start} .scale .r{display:grid;grid-template-columns:120px 1fr 90px;gap:12px;align-items:center;font-size:14px} @media (max-width:480px){.scale .r{grid-template-columns:100px 1fr 80px}}
+.scale .b{height:14px;border-radius:7px;background:var(--amber)} .scale .v{text-align:right;font-weight:700}
+/* report */
+.report{background:var(--card);border-radius:var(--r);overflow:hidden}
+.report header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 24px;border-bottom:1px solid var(--line);flex-wrap:wrap} .report header b{font-family:var(--display);font-size:15px}
+.bar{height:10px;background:var(--card2);border-radius:999px;overflow:hidden} .bar i{display:block;height:100%;width:62%;background:var(--ok)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:16px 24px} @media (max-width:640px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpis b{font-family:var(--display);font-size:20px;display:block} .kpis span{font-size:12.5px;color:var(--fg2)}
+.tbl{overflow-x:auto} .tbl table{width:100%;border-collapse:collapse;font-size:14px;min-width:620px} .tbl th,.tbl td{text-align:left;padding:10px 24px;border-top:1px solid var(--line)} .tbl th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--fg2)}
+.st{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;background:#DDEDE8;color:#2E7D6B} .st.wait{background:var(--amber-soft);color:#15202B}
+/* lists */
+.role ul{margin:10px 0 0;padding-left:18px;color:var(--fg2);font-size:15px;display:grid;gap:6px}
+/* sdg */
+.sdg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px} @media (max-width:900px){.sdg{grid-template-columns:repeat(2,minmax(0,1fr))}} @media (max-width:480px){.sdg{grid-template-columns:1fr}}
+.sdg .card{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:22px} .sdg b{font-family:var(--display);font-size:22px} .sdg p{font-size:14px;color:var(--fg2)} .sdg .card.amber p{color:#3a3a3a}
+footer{padding-block:28px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--fg2)}
+footer a{color:var(--fg2)}
+@media (prefers-reduced-motion:no-preference){.btn{transition:transform .15s ease}.btn:hover{transform:translateY(-1px)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <a class="brand" href="#home"><i></i>Lumen</a>
+  <ul>
+    <li><a href="#home" data-page="home">Ученикам</a></li>
+    <li><a href="#companies" data-page="companies">Компаниям</a></li>
+    <li><a href="#universities" data-page="universities">Вузам, студентам и волонтёрам</a></li>
+  </ul>
+  <a class="btn dark" href="#apply">Начать учиться</a>
+</nav>
+<div class="page" id="home">
+<section style="padding-top:12px">
+  <div class="hero">
+    <div class="card text">
+      <span class="eyebrow" style="justify-self:start">Бесплатное онлайн-обучение</span>
+      <h1>Учись с преподавателем. <em>Бесплатно.</em><br>С&nbsp;подтверждённым результатом</h1>
+      <p class="lead">Lumen – онлайн-платформа для школьников, которым недоступна школа или не хватает занятий. Небольшие группы, живые уроки со студентами вузов, тест и сертификат в конце каждого модуля.</p>
+      <div class="cta">
+        <a class="btn amber" href="#apply">Подать заявку</a>
+        <a class="btn light" href="#format">Как проходит обучение</a>
+      </div>
+    </div>
+    <div class="art" aria-hidden="true">
+      <div class="glow"></div>
+      <div class="blk b1">
+        <svg class="ico" viewBox="0 0 120 74" aria-hidden="true"><g fill="currentColor"><circle cx="12" cy="10" r="6"/><circle cx="44" cy="10" r="6"/><circle cx="76" cy="10" r="6"/><circle cx="108" cy="10" r="6"/><circle cx="12" cy="28" r="6"/><circle cx="44" cy="28" r="6"/><circle cx="76" cy="28" r="6"/><circle cx="108" cy="28" r="6"/><circle cx="12" cy="46" r="6"/><circle cx="44" cy="46" r="6"/><circle cx="76" cy="46" r="6"/><circle cx="108" cy="46" r="6"/><circle cx="12" cy="64" r="6"/><circle cx="44" cy="64" r="6"/><circle cx="76" cy="64" r="6"/></g><circle cx="108" cy="64" r="6" fill="#E6A63F"/></svg>
+        <span>Модуль</span><small>16 занятий за месяц</small></div>
+      <div class="blk b2">
+        <svg class="ico" viewBox="0 0 120 74" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><circle cx="16" cy="10" r="6"/><path d="M7 34c0-7 4-11 9-11s9 4 9 11"/><circle cx="45" cy="10" r="6"/><path d="M36 34c0-7 4-11 9-11s9 4 9 11"/><circle cx="74" cy="10" r="6"/><path d="M65 34c0-7 4-11 9-11s9 4 9 11"/><circle cx="103" cy="10" r="6"/><path d="M94 34c0-7 4-11 9-11s9 4 9 11"/><circle cx="16" cy="46" r="6"/><path d="M7 70c0-7 4-11 9-11s9 4 9 11"/><circle cx="45" cy="46" r="6"/><path d="M36 70c0-7 4-11 9-11s9 4 9 11"/><circle cx="74" cy="46" r="6"/><path d="M65 70c0-7 4-11 9-11s9 4 9 11"/><circle cx="103" cy="46" r="6"/><path d="M94 70c0-7 4-11 9-11s9 4 9 11"/></g></svg>
+        <span>Группа</span><small>до 8 учеников</small></div>
+      <div class="blk b3">
+        <svg class="ico" viewBox="0 0 120 60" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="4" width="112" height="52" rx="10"/><path d="M18 20h40M18 32h52M18 44h30"/><path d="M86 38l8 8 14-16" stroke="#E6A63F" stroke-width="5"/></g></svg>
+        <span>Независимый тест</span><small>принимает другой преподаватель</small></div>
+      <div class="blk b4">
+        <svg class="ico" viewBox="0 0 120 60" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="4" width="112" height="52" rx="8"/><path d="M18 20h50M18 32h36"/><circle cx="92" cy="36" r="11" fill="#E6A63F" stroke="none"/><path d="M86 48l-4 10 10-5 10 5-4-10"/></g></svg>
+        <span>Сертификат</span><small>за каждый модуль</small></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="pills">
+    <div class="pill"><b class="num">16</b><span>занятий в одном модуле</span></div>
+    <div class="pill"><b class="num">до 8</b><span>учеников в группе</span></div>
+    <div class="pill amber"><b class="num">0 руб.</b><span>стоимость для ученика</span></div>
+    <div class="pill"><b class="num">12</b><span>модулей в год, если учиться без перерыва</span></div>
+  </div>
+</section>
+
+<section id="format">
+  <span class="eyebrow">Формат обучения</span>
+  <h2 style="margin:14px 0 24px">Что тебя ждёт на платформе</h2>
+  <div class="feat">
+    <div class="card"><span class="n">01</span><h3>Живые занятия с преподавателем</h3><p>Преподают студенты университетов и волонтёры, прошедшие отбор и подготовку. Занятия онлайн, по расписанию группы. Пропустил – посмотри запись.</p></div>
+    <div class="card"><span class="n">02</span><h3>Небольшая группа своего уровня</h3><p>Короткий входной тест определяет уровень. В группе до 8 человек, поэтому вопрос можно задать на каждом занятии.</p></div>
+    <div class="card ink"><span class="n">03</span><h3>Тест и сертификат</h3><p>В конце модуля тест принимает преподаватель из другой группы. После успешного прохождения модуля каждому ученику вручается сертификат.</p></div>
+    <div class="card"><span class="n">04</span><h3>Никнейм вместо имени</h3><p>На платформе ты виден только под никнеймом. Имя, фотография и адрес не нужны, данные зашифрованы.</p></div>
+  </div>
+</section>
+
+<section id="subjects" style="padding-top:0">
+  <div class="grid g3">
+    <div class="card grey"><h3>Математика</h3><p class="fine" style="margin-top:8px;font-size:14.5px">Арифметика, дроби и проценты, уравнения, геометрия. Модули от базового уровня до подготовки к экзаменам.</p></div>
+    <div class="card grey"><h3>Английский язык</h3><p class="fine" style="margin-top:8px;font-size:14.5px">От A1 и выше. Разговорная практика в группе, грамматика, чтение.</p></div>
+    <div class="card grey"><h3>Новые предметы</h3><p class="fine" style="margin-top:8px;font-size:14.5px">Список расширяется вместе с вузами-партнёрами. Если нужного предмета нет, укажи его в заявке.</p></div>
+  </div>
+</section>
+
+<section id="apply">
+  <span class="eyebrow">Заявка</span>
+  <h2 style="margin:14px 0 24px">Как попасть на платформу</h2>
+  <div class="steps" style="margin-bottom:16px">
+    <div class="card"><span class="n">1</span><h3>Оставь почту и предмет</h3><p>Больше ничего не нужно.</p></div>
+    <div class="card"><span class="n">2</span><h3>Перейди по ссылке из письма</h3><p>Зарегистрируйся и придумай никнейм. Под ним тебя будут видеть преподаватель и группа.</p></div>
+    <div class="card"><span class="n">3</span><h3>Пройди входной тест</h3><p>Он определит уровень. Дальше ты попадаешь в группу и получаешь расписание первого модуля.</p></div>
+  </div>
+  <div class="card ink ask">
+    <div>
+      <h2 style="font-size:28px">Подать заявку на обучение</h2>
+      <p style="margin-top:12px">Почта нужна только для ссылки на платформу и напоминаний о занятиях. Обучение бесплатное.</p>
+      <p class="fine" style="margin-top:14px">Это прототип: форма ничего не отправляет.</p>
+    </div>
+    <form data-note="Заявка принята в прототипе. В рабочей версии ссылка на платформу приходит на почту в течение дня.">
+      <label class="l" for="l-email">ЭЛЕКТРОННАЯ ПОЧТА</label>
+      <input id="l-email" type="email" placeholder="you@example.com" autocomplete="email">
+      <label class="l" for="l-subj">ПРЕДМЕТ</label>
+      <select id="l-subj"><option selected>Математика</option><option>Английский язык</option><option>Другой предмет</option></select>
+      <button class="btn amber" type="submit">Отправить заявку</button>
+      <div class="note" aria-live="polite"></div>
+    </form>
+  </div>
+</section>
+</div>
+
+<div class="page" id="companies" hidden>
+<section style="padding-top:12px">
+  <div class="card" style="padding:clamp(28px,4vw,56px)">
+    <span class="eyebrow">Компаниям</span>
+    <h1 style="margin:16px 0 16px;max-width:20ch">Социальные бюджеты есть. Не хватает измеримого результата</h1>
+    <p class="lead">Lumen – инструмент импакт-инвестирования в образование. Компания оплачивает не занятия, а ученика, который прошёл модуль и сдал независимый тест, и получает отчёт с верификацией для социальной части ESG-отчётности.</p>
+    <div class="cta" style="margin-top:22px"><a class="btn amber" href="#pilot">Запросить пилотный пакет</a><a class="btn light" href="#finmodel">Как считается цена</a></div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="grid g4">
+    <div class="card stat"><b class="num">285 млрд руб.</b><span>в год – оценка совокупных расходов российских компаний на корпоративную социальную ответственность, из них около 29 млрд поступает в благотворительные НКО</span><small>Frank RG, Sber Private Banking, 2024</small></div>
+    <div class="card stat"><b class="num">60%</b><span>компаний называют сотрудничество с образовательными учреждениями самым частым направлением внешних социальных программ</span><small>опрос Лиги зелёных брендов, 45 компаний, 2024</small></div>
+    <div class="card stat"><b class="num">7%</b><span>НКО работают с развитием образования: спрос компаний на образовательные проекты выше предложения</span><small>Frank RG, Sber Private Banking, 2024</small></div>
+    <div class="card stat"><b class="num">~25%</b><span>компаний оценивают эффективность своих социальных программ; у остальных вложения разовые, направления меняются от года к году</span><small>Ассоциация менеджеров, более 140 компаний, 2026</small></div>
+  </div>
+</section>
+
+<section id="steady">
+  <span class="eyebrow">Почему ежегодно, а не разово</span>
+  <h2 style="margin:14px 0 24px">Постоянная программа выгоднее набора разрозненных проектов</h2>
+  <div class="feat">
+    <div class="card"><span class="n">01</span><h3>Сопоставимые показатели год к году</h3><p>ESG-отчётность требует динамики. Разные проекты каждый год дают несравнимые цифры, одна программа даёт ряд: столько результатов в прошлом году, столько в этом.</p></div>
+    <div class="card"><span class="n">02</span><h3>Накопленный эффект для ученика</h3><p>Один модуль даёт базовые знания, год непрерывного обучения даёт уровень. До 12 модулей в год на ученика возможны только при постоянном финансировании.</p></div>
+    <div class="card ink"><span class="n">03</span><h3>Цена снижается с ростом платформы</h3><p>Цена равна себестоимости плюс 5%. Постоянные расходы делятся на число результатов, поэтому с каждым новым спонсором результат дешевеет для всех.</p></div>
+    <div class="card"><span class="n">04</span><h3>Один договор вместо ежегодного поиска</h3><p>Выбор, проверка и сопровождение нового проекта стоят времени каждый год. Постоянная программа с верифицированной отчётностью снимает эти затраты и даёт компании именной образовательный проект.</p></div>
+  </div>
+</section>
+
+<section id="packages">
+  <span class="eyebrow">Пакеты</span>
+  <h2 style="margin:14px 0 12px">Пакеты подтверждённых результатов</h2>
+  <p class="lead" style="margin-bottom:24px">Один результат – один ученик, прошедший модуль и сдавший независимый тест. Расчётная цена результата около 1 100 рублей. Платёж только после верификации.</p>
+  <div class="grid g3">
+    <div class="card pk"><span class="eyebrow">Модуль</span><div class="price num">≈ 22 000 руб.<small>20 подтверждённых результатов</small></div><ul><li>например, 20 учеников проходят по одному модулю или 10 учеников по два</li><li>отчёт с верификацией по завершении каждого модуля</li><li>данные для социальной части ESG-отчёта</li></ul></div>
+    <div class="card pk featured"><span class="eyebrow">Класс</span><div class="price num">≈ 154 000 руб.<small>140 подтверждённых результатов</small></div><ul><li>например, 12 учеников учатся непрерывно весь учебный год</li><li>ежеквартальный отчёт с верификацией</li><li>данные для социальной части ESG-отчёта; сопоставимо с типичным чеком одной социальной программы крупной компании</li></ul></div>
+    <div class="card pk"><span class="eyebrow">Программа</span><div class="price num">≈ 550 000 руб.<small>500 подтверждённых результатов</small></div><ul><li>например, 40 учеников учатся непрерывно весь год по нескольким предметам</li><li>ежеквартальный и годовой отчёт с верификацией</li><li>данные для социальной части ESG-отчёта; именная программа компании</li></ul></div>
+  </div>
+  <p class="fine" style="margin-top:14px">Цены расчётные, при плановом объёме 1 200 результатов в год. Как считается цена: см. <a href="#finmodel">финансовую модель</a>.</p>
+</section>
+
+<section id="calc" style="padding-top:0">
+  <div class="card calc">
+    <div>
+      <h3 style="font-size:20px">Сколько результатов даёт ваш бюджет</h3>
+      <p class="fine" style="margin:8px 0 18px">Передвиньте ползунок. Расчёт по <a href="#finmodel">финансовой модели проекта</a>: цена результата ≈ 1 100 руб., до 12 модулей в год на одного ученика, группа до 8 человек.</p>
+      <label for="budget">Бюджет на социальную программу: <b id="budgetOut" class="num">230 000 руб.</b></label>
+      <input id="budget" type="range" min="20000" max="1000000" step="10000" value="230000">
+    </div>
+    <div class="out">
+      <div><b id="resOut" class="num">209</b><span>подтверждённых результатов</span></div>
+      <div><b id="stuOut" class="num">17</b><span>учеников на год непрерывного обучения</span></div>
+      <div><b id="modOut" class="num">27</b><span>групп по 8 учеников на один модуль</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="finmodel">
+  <span class="eyebrow">Финансовая модель</span>
+  <h2 style="margin:14px 0 12px">Как рассчитана цена результата</h2>
+  <p class="lead" style="margin-bottom:24px">Преподавание и приём тестов бесплатны: это вузовская практика. Платформа несёт расходы на банк тестовых заданий, координатора, техническую поддержку и банк методик. Цена для спонсора равна полной себестоимости плюс 5% на развитие.</p>
+  <div class="split">
+    <div class="card fm-wrap">
+      <table class="fm">
+        <thead><tr><th>Статья</th><th class="num">Руб. на результат</th></tr></thead>
+        <tbody>
+          <tr><td>Банк тестовых заданий (внешний методист, сдельно)</td><td class="num">≈ 200</td></tr>
+          <tr><td>Постоянные расходы, около 1,0 млн руб. в год (координатор, хостинг и поддержка платформы, гонорары за курсы для банка методик, юридическое и бухгалтерское сопровождение), на 1 200 результатов</td><td class="num">≈ 850</td></tr>
+          <tr><td>Себестоимость результата</td><td class="num">≈ 1 050</td></tr>
+          <tr><td>Комиссия платформы на развитие, 5%</td><td class="num">≈ 55</td></tr>
+          <tr class="total"><td>Цена для спонсора</td><td class="num">≈ 1 100</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card scale" aria-label="Расчётная цена результата при разном объёме">
+      <span class="eyebrow" style="justify-self:start">Цена при разном годовом объёме</span>
+      <div class="r"><span class="num">300 в год</span><div class="b" style="width:100%"></div><span class="v num">2 980 руб.</span></div>
+      <div class="r"><span class="num">1 200 в год</span><div class="b" style="width:37%"></div><span class="v num">1 105 руб.</span></div>
+      <div class="r"><span class="num">3 000 в год</span><div class="b" style="width:30%"></div><span class="v num">890 руб.</span></div>
+      <p class="fine">Точка безубыточности: около 1 100 результатов в год, порядка 90 учеников на непрерывном обучении. Стартовые инвестиции 1,15 млн руб. привлекаются грантами. Полная модель предоставляется по запросу.</p>
+    </div>
+  </div>
+</section>
+
+<section id="report">
+  <span class="eyebrow">Что получает спонсор</span>
+  <h2 style="margin:14px 0 12px">Отчёт с независимой верификацией</h2>
+  <p class="lead" style="margin-bottom:24px">Каждый рубль привязан к обезличенному результату. Ученик в отчёте показан никнеймом и прогрессом, без имени, фотографии и геолокации. Отчёт готов для социальной части ESG-отчётности.</p>
+  <div class="report" aria-label="Пример отчёта спонсора">
+    <header><div><b>Пакет «Класс» · 140 результатов</b><div class="fine">Пример отчёта. Данные условные.</div></div><span class="st">верификация: независимый тест</span></header>
+    <div style="padding:16px 24px 0"><div class="bar"><i></i></div></div>
+    <div class="kpis">
+      <div><b class="num">87 / 140</b><span>результатов подтверждено</span></div>
+      <div><b class="num">95 700 руб.</b><span>списано со счёта пакета</span></div>
+      <div><b class="num">92%</b><span>дошли до теста и сдали</span></div>
+      <div><b class="num">11</b><span>групп, 3 предмета</span></div>
+    </div>
+    <div class="tbl"><table>
+      <thead><tr><th>Ученик</th><th>Модуль</th><th>Преподаватель</th><th>Тест принял</th><th>Балл</th><th>Статус</th></tr></thead>
+      <tbody>
+        <tr><td>stella_7</td><td>Математика · дроби и проценты</td><td>практикант УрФУ</td><td>практикант другой группы</td><td class="num">17 / 20</td><td><span class="st">подтверждён</span></td></tr>
+        <tr><td>north_wind</td><td>Математика · дроби и проценты</td><td>практикант УрФУ</td><td>практикант другой группы</td><td class="num">15 / 20</td><td><span class="st">подтверждён</span></td></tr>
+        <tr><td>mira22</td><td>Английский · A1, модуль 2</td><td>практикант УрФУ</td><td>не назначен</td><td class="num">ожидается</td><td><span class="st wait">тест 14.11</span></td></tr>
+        <tr><td>luna_k</td><td>Математика · уравнения</td><td>практикант УрФУ</td><td>практикант другой группы</td><td class="num">9 / 20</td><td><span class="st wait">пересдача</span></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section id="sdg">
+  <span class="eyebrow">Цели устойчивого развития</span>
+  <h2 style="margin:14px 0 12px">Какие ЦУР закрывает ваша программа</h2>
+  <p class="lead" style="margin-bottom:24px">Каждый подтверждённый результат – вклад компании в четыре цели устойчивого развития ООН. Отчёт платформы раскладывает результаты по целям для нефинансовой отчётности.</p>
+  <div class="sdg">
+    <div class="card amber"><b>ЦУР 4</b><h3>Качественное образование</h3><p>Основная цель проекта: доступ детей к обучению с подтверждённым результатом.</p></div>
+    <div class="card"><b>ЦУР 5</b><h3>Гендерное равенство</h3><p>Доступ к образованию для девочек из стран, где у них нет такой возможности.</p></div>
+    <div class="card"><b>ЦУР 10</b><h3>Уменьшение неравенства</h3><p>Обучение для детей, которым недоступна школа или не хватает занятий.</p></div>
+    <div class="card ink"><b>ЦУР 17</b><h3>Партнёрство</h3><p>Компании, вузы и платформа в одной измеримой программе.</p></div>
+  </div>
+</section>
+
+<section id="pilot">
+  <div class="card ink ask">
+    <div>
+      <span class="eyebrow" style="background:transparent;border-color:#3A4A63;color:var(--ink-muted)">Пилот</span>
+      <h2 style="font-size:28px;margin-top:14px">Запросить пилотный пакет</h2>
+      <p style="margin-top:12px">После заявки мы отправим вам доступ к платформе для ознакомления: вы увидите, как устроены группы, тестирование и отчёт спонсора, и сможете выбрать пакет.</p>
+      <p class="fine" style="margin-top:14px">Это прототип: форма ничего не отправляет.</p>
+    </div>
+    <form data-note="Заявка принята в прототипе. В рабочей версии координатор отвечает в течение двух рабочих дней.">
+      <label class="l" for="c-org">КОМПАНИЯ</label>
+      <input id="c-org" placeholder="Название компании" autocomplete="organization">
+      <label class="l" for="c-pack">ПАКЕТ</label>
+      <select id="c-pack"><option>Модуль · 20 результатов</option><option selected>Класс · 140 результатов</option><option>Программа · 500 результатов</option></select>
+      <label class="l" for="c-email">РАБОЧАЯ ПОЧТА</label>
+      <input id="c-email" type="email" placeholder="name@company.ru" autocomplete="email">
+      <button class="btn amber" type="submit">Запросить расчёт</button>
+      <div class="note" aria-live="polite"></div>
+    </form>
+  </div>
+</section>
+</div>
+
+<div class="page" id="universities" hidden>
+<section style="padding-top:12px">
+  <div class="card" style="padding:clamp(28px,4vw,56px)">
+    <span class="eyebrow">Вузам и студентам</span>
+    <h1 style="margin:16px 0 16px;max-width:18ch">Практика, которая учит детей</h1>
+    <p class="lead">Студенты преподают на платформе и принимают тесты у другой группы в рамках практической подготовки по договору между вузом и платформой. Вуз получает базу практики без затрат, студент – зачёт, сертификат и портфолио. Преподавать можно и вне практики: платформа открыта для волонтёров с профильным образованием или опытом преподавания.</p>
+    <div class="cta" style="margin-top:22px"><a class="btn amber" href="#u-forms">Подать заявку</a><a class="btn light" href="#uhow">Как это устроено</a></div>
+  </div>
+</section>
+
+<section id="uhow" style="padding-top:0">
+  <div class="feat">
+    <div class="card"><span class="n">01</span><h3>Договор вуза с платформой</h3><p>Типовой договор о практической подготовке между вузом и платформой. Договор заключается один раз и действует для всех потоков практикантов.</p></div>
+    <div class="card"><span class="n">02</span><h3>Отбор и подготовка</h3><p>Заявка, видеособеседование с координатором и короткое пробное занятие. Затем вводный курс: стандарт модуля, правила работы с данными учеников, кодекс волонтёра. После этого преподаватель получает группу.</p></div>
+    <div class="card ink"><span class="n">03</span><h3>Преподавание и тесты</h3><p>Студент ведёт группу до 8 учеников по модулю из 16 занятий и принимает тесты у другой группы. Также каждый студент-практикант создаёт свой модуль по выбранной теме: разрабатывает темы занятий и задания.</p></div>
+    <div class="card"><span class="n">04</span><h3>Зачёт и портфолио</h3><p>Зачёт практики, сертификат, портфолио. Созданный курс стандартизируется и входит в банк методик платформы.</p></div>
+  </div>
+</section>
+
+<section id="benefits">
+  <span class="eyebrow">Что получает каждая сторона</span>
+  <h2 style="margin:14px 0 24px">Выгоды</h2>
+  <div class="grid g2">
+    <div class="card role"><h3>Вузу-партнёру</h3><ul><li>база практики по типовому договору о практической подготовке, без затрат для вуза</li><li>постоянные места практики для студентов каждый семестр</li><li>участие в проекте по целям устойчивого развития как показатель для отчётности вуза</li><li>курсы, созданные студентами, остаются в банке методик и работают дальше</li></ul></div>
+    <div class="card role"><h3>Студенту-практиканту</h3><ul><li>зачёт практики, сертификат, портфолио</li><li>опыт преподавания в небольшой группе и опыт независимого оценивания</li><li>подготовка: вводный курс, стандарт модуля, поддержка координатора</li><li>нагрузка совместима с учёбой: 16 занятий за месяц в удобное время</li></ul></div>
+  </div>
+  <p class="fine" style="margin-top:14px">Правовая основа: приказ Минобрнауки России и Минпросвещения России от 05.08.2020 № 885/390 «О практической подготовке обучающихся». Первый вуз-партнёр: Уральский федеральный университет.</p>
+</section>
+
+<section id="usdg" style="padding-top:0">
+  <div class="grid g2">
+    <div class="card amber"><b style="font-family:var(--display);font-size:22px">ЦУР 4</b><h3 style="margin-top:8px">Качественное образование</h3><p style="margin-top:8px;font-size:14.5px">Вуз участвует в проекте, который даёт детям доступ к обучению с подтверждённым результатом. Это показатель социальной роли университета и материал для его отчётности по устойчивому развитию.</p></div>
+    <div class="card ink"><b style="font-family:var(--display);font-size:22px">ЦУР 17</b><h3 style="margin-top:8px">Партнёрство в интересах устойчивого развития</h3><p style="margin-top:8px;font-size:14.5px">Вуз, компании и платформа работают в одной программе: студенты получают практику, компании – измеримый результат, дети – обучение.</p></div>
+  </div>
+</section>
+
+<section id="u-forms">
+  <span class="eyebrow">Заявки</span>
+  <h2 style="margin:14px 0 24px">Присоединиться к платформе</h2>
+  <div class="grid g3">
+    <div class="card ink ask" style="grid-template-columns:1fr">
+      <div>
+        <h2 style="font-size:24px">Стать вузом-партнёром</h2>
+        <p style="margin-top:10px">Координатор платформы свяжется с вами, пришлёт проект договора о практической подготовке и предложит направления для практики.</p>
+        <p class="fine" style="margin-top:10px">Это прототип: форма ничего не отправляет.</p>
+      </div>
+      <form data-note="Заявка принята в прототипе. В рабочей версии координатор отвечает в течение двух рабочих дней.">
+        <label class="l" for="u-org">ВУЗ</label>
+        <input id="u-org" placeholder="Название вуза" autocomplete="organization">
+        <label class="l" for="u-dept">ПОДРАЗДЕЛЕНИЕ</label>
+        <input id="u-dept" placeholder="Институт, факультет или кафедра">
+        <label class="l" for="u-email">ЭЛЕКТРОННАЯ ПОЧТА</label>
+        <input id="u-email" type="email" placeholder="name@university.ru" autocomplete="email">
+        <button class="btn amber" type="submit">Отправить заявку вуза</button>
+        <div class="note" aria-live="polite"></div>
+      </form>
+    </div>
+    <div class="card ink ask" style="grid-template-columns:1fr">
+      <div>
+        <h2 style="font-size:24px">Пройти практику на платформе</h2>
+        <p style="margin-top:10px">Если ваш вуз уже партнёр, вы попадёте в ближайший набор. Если нет, мы свяжемся с вашим вузом и предложим договор.</p>
+        <p class="fine" style="margin-top:10px">Это прототип: форма ничего не отправляет.</p>
+      </div>
+      <form data-note="Заявка принята в прототипе. В рабочей версии приглашение на собеседование приходит на почту.">
+        <label class="l" for="s-uni">ВУЗ И НАПРАВЛЕНИЕ</label>
+        <input id="s-uni" placeholder="Например: УрФУ, лингвистика, 3 курс">
+        <label class="l" for="s-subj">ПРЕДМЕТ, КОТОРЫЙ ГОТОВЫ ВЕСТИ</label>
+        <select id="s-subj"><option selected>Математика</option><option>Английский язык</option><option>Другой</option></select>
+        <label class="l" for="s-email">ЭЛЕКТРОННАЯ ПОЧТА</label>
+        <input id="s-email" type="email" placeholder="name@example.com" autocomplete="email">
+        <button class="btn amber" type="submit">Отправить заявку студента</button>
+        <div class="note" aria-live="polite"></div>
+      </form>
+    </div>
+    <div class="card ink ask" style="grid-template-columns:1fr">
+      <div>
+        <h2 style="font-size:24px">Стать волонтёром-преподавателем</h2>
+        <p style="margin-top:10px">Для тех, кто хочет учить детей вне практики: студенты старших курсов, выпускники, учителя и репетиторы.</p><p style="margin-top:8px">Как проходит отбор: вы оставляете заявку, координатор назначает видеособеседование на 20–30 минут, затем вы проводите короткое пробное занятие по теме из банка модулей. После этого вводный курс о стандарте модуля, правилах работы с данными учеников и кодексе волонтёра, и вы получаете первую группу. Нагрузка: 16 занятий за месяц по расписанию, которое вы выбираете сами.</p>
+        <p class="fine" style="margin-top:10px">Это прототип: форма ничего не отправляет.</p>
+      </div>
+      <form data-note="Заявка принята в прототипе. В рабочей версии приглашение на собеседование приходит на почту.">
+        <label class="l" for="v-about">КТО ВЫ</label>
+        <input id="v-about" placeholder="Например: учитель математики, 5 лет опыта">
+        <label class="l" for="v-subj">ПРЕДМЕТ, КОТОРЫЙ ГОТОВЫ ВЕСТИ</label>
+        <select id="v-subj"><option selected>Математика</option><option>Английский язык</option><option>Другой</option></select>
+        <label class="l" for="v-email">ЭЛЕКТРОННАЯ ПОЧТА</label>
+        <input id="v-email" type="email" placeholder="name@example.com" autocomplete="email">
+        <button class="btn amber" type="submit">Отправить заявку волонтёра</button>
+        <div class="note" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+</section>
+</div>
+<footer>
+  <span>Lumen. Образовательная онлайн-платформа. Прототип, 2026.</span>
+  <span><a href="#companies">Компаниям</a> · <a href="#universities">Вузам, студентам и волонтёрам</a></span>
+</footer>
+</div>
+<script>
+(function(){
+  var fmt=function(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ');};
+  var pages=['home','companies','universities'];
+  function show(){
+    var h=(location.hash||'#home').slice(1), page=pages.indexOf(h)>=0?h:null, target=null;
+    if(!page){var el=document.getElementById(h); page=el?(el.closest('.page')||{}).id||'home':'home'; target=el;}
+    pages.forEach(function(p){document.getElementById(p).hidden=(p!==page);});
+    Array.prototype.forEach.call(document.querySelectorAll('nav a[data-page]'),function(a){a.classList.toggle('active',a.getAttribute('data-page')===page);});
+    if(target){target.scrollIntoView({block:'start'});} else {window.scrollTo(0,0);}
+  }
+  window.addEventListener('hashchange',show); show();
+  var b=document.getElementById('budget');
+  if(b){var PRICE=1100,MODS=12,GROUP=8,bo=document.getElementById('budgetOut'),ro=document.getElementById('resOut'),so=document.getElementById('stuOut'),mo=document.getElementById('modOut');
+    var upd=function(){var v=+b.value,r=Math.floor(v/PRICE);bo.textContent=fmt(v)+' руб.';ro.textContent=fmt(r);so.textContent=fmt(Math.floor(r/MODS));mo.textContent=fmt(Math.ceil(r/GROUP));};
+    b.addEventListener('input',upd);upd();}
+  Array.prototype.forEach.call(document.querySelectorAll('form[data-note]'),function(f){
+    f.addEventListener('submit',function(e){e.preventDefault();var n=f.querySelector('.note');if(n)n.textContent=f.getAttribute('data-note');});
+  });
+})();
+</script>
+</body>
+</html>
